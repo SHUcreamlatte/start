@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <title>jQuery 회원가입</title>
+
+    <script>
+        function sendit(){
+            // 정규식
+            const checkName = RegExp(/[가-힣]+$/);
+            const checkPw = RegExp(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/);
+            const checkEmail = RegExp(/^[A-Za-z0-9\.\-]+@[A-Za-z0-9\.\-]+\.[A-Za-z0-9]+$/);
+            const checkHp = RegExp(/^010\d{3,4}\d{4}$/);
+            const checkHobby = false;
+            const lengthSsn = new Array(13);
+
+            // 아이디를 입력하지 않았을 경우
+            if($("#userid").val()==''){
+                alert("아이디를 입력하세요.");
+                $("#userid").focus();
+                return false;
+            }
+            // 아이디가 4자 미만 또는 16자를 초과하는 경우
+            if($("#userid").val().length < 4 || $("#userid").val().length > 16){
+                alert("아이디는 4자이상 16자이하로 입력하세요.");
+                $("#userid").focus();
+                return false;
+            }
+
+            // 비밀번호를 입력하지 않은 경우
+            if($("#userpw").val()==''){
+                alert("비밀번호를 입력하세요.");
+                $("#userpw").focus();
+                return false;
+            }
+
+            if(!checkPw.test($("#userpw").val())){
+                alert("비밀번호는 8자 이상이어야 하며, 숫자/대문자/소문자/특수문자를 모두 포함해주세요.");
+                $("#userpw").val("");
+                $("#userpw").focus("");
+                return false;
+            }
+
+            // 비밀번호 확인을 입력하지 않은 경우
+            if($("#userpw_re").val()==''){
+                alert("비밀번호를 다시한번 입력해주세요.");
+                $("#userpw_re").focus();
+                return false;
+            }
+
+            // 비밀번호와 비밀번호 확인의 값이 다른 경우
+            if($("#userpw").val() != $("#userpw_re").val()){
+                alert("비밀번호와 비밀번호 확인의 값이 다릅니다.");
+                $("#userpw_re").focus();
+                return false;
+            }
+
+            // 아이디 비밀번호 같을 경우
+            if($("#userid").val() == $("#userpw").val()){
+                alert("아이디와 비밀번호가 동일합니다. 다시 입력해주세요.");
+                $("#userid").focus();
+                return false;
+            }
+
+            // 이름 작성여부
+            if(!checkName.test($("#name").val())){
+                alert("이름 형식이 올바르지 않습니다.");
+                $("#name").val("");
+                $("#name").focus();
+                return false;
+            }
+
+            // 휴대폰 번호 작성여부
+            if($("#hp").val()==''){
+                alert("휴대폰 번호를 입력하세요.");
+                $("#hp").focus();
+                return false;
+            }
+
+            // 휴대폰 번호 형식 확인
+            if(!checkHp.test($("#hp").val())){
+                alert("010부터 휴대폰번호 10자리 또는 11자리를 입력해주세요.");
+                $("#hp").focus();
+                return false;
+            }
+
+            // 이메일 작성여부
+            if($("#email").val()==''){
+                alert("이메일을 입력하세요.");
+                $("#email").focus();
+                return false;
+            }
+
+            // 이메일 작성양식
+            if(!checkEmail.test($("#email").val())){
+                alert("이메일 형식을 확인하세요.");
+                $("#email").focus();
+                return false;
+            }
+
+            // 취미 체크
+            for(let i=0; i<$("input:checkbox").length; i++){
+                if($("input:checkbox").eq(i).is(":checked")==true){
+                    checkHobby = true;
+                    break;
+
+                }
+                if(!checkHobby){
+                    alert("하나 이상의 취미를 선택하세요.");
+                    return false;
+                }
+            }
+
+            // 주민등록번호 작성여부
+            if($("#ssn1").val()=='' || $("#ssn2").val()==''){
+                alert("주민등록번호를 입력하세요.");
+                $("#ssn1").focus();
+                return false;
+            }
+
+            if($("#isssn").value=='n'){
+                alert("주민등록번호 검증버튼을 눌러주세요");
+                return false;
+            }
+
+            // 주민등록번호 검증 버튼이 눌렸을 경우 ssnCheck() 함수 실행
+            if($("#ssnButton").on("click", ssnCheck()));
+
+            // 주민등록번호가 유효할 경우 
+            if($("#isssn").value=='y'){
+                alert("주민등록번호 검증이 완료되었습니다.");
+            }
+
+            return true;
+        }
+
+        // 주민등록번호
+        function ssnCheck(){
+            // 전체 주민등록번호 저장
+            let ssnTotal = $("#ssn1").val() + $("#ssn2").val();
+
+            // 포맷설정
+            let fmt = RegExp(/^\d{6}[1234]\d{6}$/);
+            let lengthSsn = new Array(13);
+
+            // 주민등록번호 공백 확인
+            if($("#ssn1").val()=='' || $("#ssn2").val()==''){
+                alert("주민등록번호를 입력하세요.");
+                $("#ssn1").focus();
+                return false;
+            }
+
+            // 주민등록번호 유효성 검사
+            if(!fmt.test(ssnTotal)){
+                alert("주민등록번호를 다시한번 확인해주세요.");
+                $("#ssn1").focus();
+                return false;
+            }
+
+            // 주민등록번호 존재 검사
+            for(let i=0; i < lengthSsn.length; i++){
+                lengthSsn[i] = parseInt(ssnTotal.charAt(i));
+            }
+
+            let multipliers = [2,3,4,5,6,7,8,9,2,3,4,5];
+            let sum = 0;
+
+            for(let i=0; i < 12; i++){
+                sum += (lengthSsn[i] *= multipliers[i]);
+            }
+
+            if((11 - (sum % 11)) % 10 != lengthSsn[12]){
+                // 잘못된 주민등록 번호
+                alert("주민등록번호가 유효하지 않습니다.");
+                $("#ssn1").focus();
+                return false;
+            }else{
+                // 유효한 주민등록 번호
+                alert("주민등록번호가 유효합니다.");
+                $("#isssn").value=='y';
+            }
+        }
+
+        function changeSsn(){
+            $("#isssn").value=='n';
+        }
+
+    </script>
+</head>
+<body>
+    <h2>회원가입</h2>
+    <form action="./loginPage" method="post" onsubmit="return sendit()">
+        <input type="hidden" name="isssn" id="isssn" value="n">
+        <!-- 주민등록번호 확인 -->
+        <p><label>아이디 : <input type="text" name="userid" id="userid" maxlength="20"></label></p>
+        <p><label>비밀번호 : <input type="password" name="userpw" id="userpw" maxlength="20"></label></p>
+        <p><label>비밀번호 확인 : <input type="password" name="userpw_re" id="userpw_re" maxlength="20"></label></p>
+        <p><label>이름 : <input type="text" name="name" id="name"></label></p>
+        <p><label>휴대폰 번호 : <input type="text" name="hp" id="hp"></label></p>
+        <p><label>이메일 : <input type="email" name="email" id="email"></label></p>
+        <p>취미 : 
+            <label>영화감상<input type="checkbox" name="hobby" value="영화감상"></label><label>여행<input type="checkbox" name="hobby" value="여행"></label><label>요가<input type="checkbox" name="hobby" value="요가"></label><label>스키<input type="checkbox" name="hobby" value="스키"></label>
+        </p>
+        <p>주민등록번호 : <input type="text" name="ssn1" id="ssn1" maxlength="6"
+            onkeyup="moveFocus()" onchange="changeSsn()"> - <input type="password" name="ssn2" id="ssn2" onchange="changeSsn()"><input type="button" id="ssnButton" value="주민등록번호 검증" onclick="ssnCheck()">
+        </p>
+        <p>
+            <input type="submit" value="가입완료">
+            <input type="reset" value="다시작성">
+        </p>
+    </form>
+
+    
+</body>
+</html>
